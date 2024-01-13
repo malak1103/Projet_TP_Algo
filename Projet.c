@@ -2,105 +2,107 @@
 #include <stdlib.h>
 #include "include/raylib.h"
 
-typedef struct liste liste;
-struct liste {
-    int v;
-    liste* suiv;
+typedef struct Node Node;
+typedef struct Node {
+    int data;
+    Node* next;
 };
+Node* head = NULL;
 
-liste* creer_noeud() {
-    liste* nouveau_noeud = (liste*)malloc(sizeof(liste));
-    return nouveau_noeud;
-}
 
-void CreerListe_Tete(liste** Tete, int n) {
-    liste* nouv;
-    int v;
 
-    for (int i = 0; i < n; i++) {
-        printf("Entrez la valeur du noeud %d : ", i + 1);
-        scanf("%d", &v);
-
-        nouv = creer_noeud();
-
-        if (nouv != NULL) {
-            nouv->v = v;
-            nouv->suiv = *Tete;
-            *Tete = nouv;
-        }
+// Function to delete an element from the list at a given position k
+void deleteElementAtPosition(int position) {
+    if (head == NULL) {
+        printf("List is empty. Deletion not possible.\n");
+        return;
     }
-}
 
-// Fonction pour supprimer un nœud après une position donnée
-liste* supprimer(liste* tete, int position) {
-    if (tete == NULL) {
-        printf("La liste est vide.\n");
-        return NULL;
-    }
+    Node* temp = head;
 
     if (position == 1) {
-        // Supprimer la tête de la liste
-        liste* new_debut = tete->suiv;
-        free(tete);
-        return new_debut;
+        head = temp->next;
+        free(temp);
+    } else {
+        for (int i = 1; i < position - 1 && temp != NULL; ++i) {
+            temp = temp->next;
+        }
+
+        if (temp != NULL && temp->next != NULL) {
+            Node* toDelete = temp->next;
+            temp->next = toDelete->next;
+            free(toDelete);
+        } else {
+            printf("Invalid position for deletion.\n");
+        }
     }
-
-    liste* courant = tete;
-    int i;
-
-    // Parcourir la liste jusqu'à la position précédant le nœud à supprimer
-    for (i = 1; i < position - 1 && courant != NULL; ++i) {
-        courant = courant->suiv;
-    }
-
-    // Vérifier si la position est valide
-    if (courant == NULL || courant->suiv == NULL) {
-        printf("Position invalide.\n");
-        return tete;
-    }
-
-    // Supprimer le nœud après la position donnée
-    liste* element_a_supprimer = courant->suiv;
-    courant->suiv = courant->suiv->suiv;
-    free(element_a_supprimer);
-
-    return tete;
 }
 
-liste* tri_par_selection(liste* tete) {
-    liste *i, *j, *min;
+// Function to perform bubble sort on the list
+void bubbleSort() {
+    int swapped;
+    Node* ptr1;
+    Node* lptr = NULL;
 
-    for (i = tete; i != NULL; i = i->suiv) {
-        min = i;
-        for (j = i->suiv; j != NULL; j = j->suiv) {
-            if (j->v < min->v) {
-                min = j;
+    if (head == NULL)
+        return;
+
+    do {
+        swapped = 0;
+        ptr1 = head;
+
+        while (ptr1->next != lptr) {
+            if (ptr1->data > ptr1->next->data) {
+                int temp = ptr1->data;
+                ptr1->data = ptr1->next->data;
+                ptr1->next->data = temp;
+                swapped = 1;
             }
+            ptr1 = ptr1->next;
         }
-        // Échanger les données des nœuds i et min
-        int temp = i->v;
-        i->v = min->v;
-        min->v = temp;
-    }
+        lptr = ptr1;
+    } while (swapped);
+}
 
     return tete;
 }
 
 int main() {
-    const int screenWidth = 800;
+   const int screenWidth = 800;
     const int screenHeight = 600;
 
-    InitWindow(screenWidth, screenHeight, "Liste avec Raylib");
+    InitWindow(screenWidth, screenHeight, "Raylib LinkedList Visualization");
 
-    liste* tete = NULL;
-
-    CreerListe_Tete(&tete, 5);
+    SetTargetFPS(60);
 
     while (!WindowShouldClose()) {
         BeginDrawing();
         ClearBackground(RAYWHITE);
 
-        // Dessinez ici votre liste en utilisant DrawText ou d'autres fonctions de dessin Raylib
+        // UI
+        DrawText("Press 1: Add Element  2: Delete Element  3: Start Sorting", 10, 10, 20, BLACK);
+
+        if (IsKeyPressed(KEY_ONE)) {
+            int data, position;
+            printf("Enter a number: ");
+            scanf("%d", &data);
+            printf("Enter position to insert: ");
+            scanf("%d", &position);
+            addElementAtPosition(data, position);
+        }
+
+        if (IsKeyPressed(KEY_TWO)) {
+            int position;
+            printf("Enter position to delete: ");
+            scanf("%d", &position);
+            deleteElementAtPosition(position);
+        }
+
+        if (IsKeyPressed(KEY_THREE)) {
+            bubbleSort();
+        }
+
+        drawList();
 
         EndDrawing();
     }
