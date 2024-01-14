@@ -1,6 +1,7 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include "include/raylib.h"
+#include <string.h>
 
 typedef struct Node Node;
 typedef struct Node {
