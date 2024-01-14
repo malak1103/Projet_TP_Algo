@@ -84,6 +84,41 @@ void drawList(int highlightedNode)
     }
 }
 
+// Function to add an element to the list at a given position k
+void addElementAtPosition(int data, int position)
+{
+    Node *newNode = malloc(sizeof(Node));
+    newNode->data = data;
+
+    if (position == 1)
+    {
+        newNode->next = head;
+        head = newNode;
+    }
+
+    else
+    {
+        Node *temp = head;
+
+        for (int i = 1; i < position - 1 && temp != NULL; ++i)
+        {
+            temp = temp->next;
+        }
+
+        if (temp != NULL)
+        {
+            newNode->next = temp->next;
+            temp->next = newNode;
+        }
+
+        else
+        {
+            printf("Invalid position for insertion.\n");
+            free(newNode);
+        }
+    }
+}
+
 
 
 
