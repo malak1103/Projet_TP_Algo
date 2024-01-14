@@ -83,43 +83,9 @@ void drawList(int highlightedNode)
         current = current->next;
     }
 }
-// Function to delete an element from the list at a given position k
-void deleteElementAtPosition(int position)
-{
-    if (head == NULL)
-    {
-        printf("List is empty. Deletion not possible.\n");
-        return;
-    }
 
-    Node *temp = head;
 
-    if (position == 1)
-    {
-        head = temp->next;
-        free(temp);
-    }
 
-    else
-    {
-        for (int i = 1; i < position - 1 && temp != NULL; ++i)
-        {
-            temp = temp->next;
-        }
-
-        if (temp != NULL && temp->next != NULL)
-        {
-            Node *toDelete = temp->next;
-            temp->next = toDelete->next;
-            free(toDelete);
-        }
-
-        else
-        {
-            printf("Invalid position for deletion.\n");
-        }
-    }
-}
 
 int isMouseOverButton(int x, int y, int width, int height)
 {
