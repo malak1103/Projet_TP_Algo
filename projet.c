@@ -12,7 +12,7 @@ Node* head = NULL;
 
 // Function to create a singly linked list by reading elements
 void createList() {
-    head = NULL;
+     head = NULL;
     int data;
 
     printf("Enter the number of elements in the list: ");
@@ -44,9 +44,9 @@ void insertAtEnd(int data) {
 }
 
 // Function to draw a rectangle representing a list node
-void drawNodeRectangle(int posX, int posY, int data) {
+void drawNodeRectangle(int posX, int posY, int data, bool highlighted) {
     // Draw the rectangle containing the data
-    DrawRectangle(posX, posY, 50, 50, LIGHTGRAY);
+    DrawRectangle(posX, posY, 50, 50, highlighted ? SKYBLUE : LIGHTGRAY);
     DrawText(TextFormat("%d", data), posX + 10, posY + 10, 20, BLACK);
 
     // Draw the arrow
@@ -55,37 +55,65 @@ void drawNodeRectangle(int posX, int posY, int data) {
 }
 
 // Function to draw the entire linked list
-void drawList() {
+void drawList(int highlightedNode) {
     Node* current = head;
     int posX = 50;
     int posY = 200;
 
     while (current != NULL) {
-        drawNodeRectangle(posX, posY, current->data);
+        drawNodeRectangle(posX, posY, current->data, (highlightedNode == current->data));
         posX += 120;
         current = current->next;
     }
 }
-// Function to add an element to the list at a given position k
-void addElementAtPosition(int data, int position) {
-    Node* newNode =malloc(sizeof(Node));
-    newNode->data = data;
+// Function to delete an element from the list at a given position k
+void deleteElementAtPosition(int position) {
+    if (head == NULL) {
+        printf("List is empty. Deletion not possible.\n");
+        return;
+    }
+
+    Node* temp = head;
 
     if (position == 1) {
-        newNode->next = head;
-        head = newNode;
+        head = temp->next;
+        free(temp);
     } else {
-        Node* temp = head;
         for (int i = 1; i < position - 1 && temp != NULL; ++i) {
             temp = temp->next;
         }
 
-        if (temp != NULL) {
-            newNode->next = temp->next;
-            temp->next = newNode;
+        if (temp != NULL && temp->next != NULL) {
+            Node* toDelete = temp->next;
+            temp->next = toDelete->next;
+            free(toDelete);
         } else {
-            printf("Invalid position for insertion.\n");
-            free(newNode);
+            printf("Invalid position for deletion.\n");
         }
     }
+}
+
+// Function to handle user input
+void handleInput(int* highlightedNode) {
+    if (IsKeyPressed(KEY_ONE)) {
+        int data, position;
+        printf("Enter a number: ");
+        scanf("%d", &data);
+        printf("Enter position to insert: ");
+        scanf("%d", &position);
+        addElementAtPosition(data, position);
+    }
+
+    if (IsKeyPressed(KEY_TWO)) {
+        int position;
+        printf("Enter position to delete: ");
+        scanf("%d", &position);
+        deleteElementAtPosition(position);
+    }
+
+    if (IsKeyPressed(KEY_THREE)) {
+        bubbleSort();
+    }
+
+    *highlightedNode = 0; // Reset highlighted node after processing input
 }
