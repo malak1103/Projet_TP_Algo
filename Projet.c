@@ -66,14 +66,39 @@ void bubbleSort() {
 
     return tete;
 }
+// Function to handle user input
+void handleInput(int* highlightedNode) {
+    if (IsKeyPressed(KEY_ONE)) {
+        int data, position;
+        printf("Enter a number: ");
+        scanf("%d", &data);
+        printf("Enter position to insert: ");
+        scanf("%d", &position);
+        addElementAtPosition(data, position);
+    }
 
+    if (IsKeyPressed(KEY_TWO)) {
+        int position;
+        printf("Enter position to delete: ");
+        scanf("%d", &position);
+        deleteElementAtPosition(position);
+    }
+
+    if (IsKeyPressed(KEY_THREE)) {
+        bubbleSort();
+    }
+
+    *highlightedNode = 0; // Reset highlighted node after processing input
+}
 int main() {
-   const int screenWidth = 800;
+    const int screenWidth = 800;
     const int screenHeight = 600;
 
     InitWindow(screenWidth, screenHeight, "Raylib LinkedList Visualization");
 
     SetTargetFPS(60);
+
+    int highlightedNode = 0;
 
     while (!WindowShouldClose()) {
         BeginDrawing();
@@ -82,27 +107,9 @@ int main() {
         // UI
         DrawText("Press 1: Add Element  2: Delete Element  3: Start Sorting", 10, 10, 20, BLACK);
 
-        if (IsKeyPressed(KEY_ONE)) {
-            int data, position;
-            printf("Enter a number: ");
-            scanf("%d", &data);
-            printf("Enter position to insert: ");
-            scanf("%d", &position);
-            addElementAtPosition(data, position);
-        }
+        handleInput(&highlightedNode);
 
-        if (IsKeyPressed(KEY_TWO)) {
-            int position;
-            printf("Enter position to delete: ");
-            scanf("%d", &position);
-            deleteElementAtPosition(position);
-        }
-
-        if (IsKeyPressed(KEY_THREE)) {
-            bubbleSort();
-        }
-
-        drawList();
+        drawList(highlightedNode);
 
         EndDrawing();
     }
