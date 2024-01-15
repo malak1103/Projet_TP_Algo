@@ -63,7 +63,10 @@ void bubbleSort() {
     } while (swapped);
 }
 
-    
+    return tete;
+}
+
+}
 int main() {
      const int screenWidth = 800;
     const int screenHeight = 600;
