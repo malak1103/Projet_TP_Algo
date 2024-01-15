@@ -1,57 +1,131 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
-#include "include/raylib.h"
+#include <raylib.h>
 
-typedef struct Node Node;
-typedef struct Node {
+typedef struct Node
+{
     int data;
-    Node* next;
-};
-Node* head = NULL;
+    struct Node *next;
+} Node;
+
+Node *head = NULL;
+
+int isMouseOverButton(int x, int y, int width, int height)
+{
+    Vector2 mouse = GetMousePosition();
+    return (mouse.x >= x && mouse.x <= x + width && mouse.y >= y && mouse.y <= y + height);
+}
+
+// Function to insert an element at the end of the list
+void insertAtEnd(int data)
+{
+    Node *newNode = malloc(sizeof(Node));
+    newNode->data = data;
+    newNode->next = NULL;
+
+    if (head == NULL)
+    {
+        head = newNode;
+    }
+
+    else
+    {
+        Node *temp = head;
+
+        while (temp->next != NULL)
+        {
+            temp = temp->next;
+        }
+
+        temp->next = newNode;
+    }
+}
+
+// Function to draw a rectangle representing a list node
+void drawNodeRectangle(int posX, int posY, int data, bool highlighted)
+{
+    // Draw the rectangle containing the data
+    DrawRectangle(posX, posY, 50, 50, highlighted ? SKYBLUE : LIGHTGRAY);
+    DrawText(TextFormat("%d", data), posX + 10, posY + 10, 20, BLACK);
+
+    // Draw the arrow
+    DrawLine(posX + 50, posY + 25, posX + 100, posY + 25, BLACK);
+    DrawTriangle((Vector2){posX + 100, posY + 25}, (Vector2){posX + 120, posY + 20}, (Vector2){posX + 120, posY + 30}, BLACK);
+}
+
+// Function to draw the entire linked list
+void drawList(int highlightedNode)
+{
+    Node *current = head;
+
+    int posX = 50;
+    int posY = 200;
+
+    while (current != NULL)
+    {
+        drawNodeRectangle(posX, posY, current->data, (highlightedNode == current->data));
+        posX += 120;
+
+        current = current->next;
+    }
+}
 
 // Function to delete an element from the list at a given position k
-void deleteElementAtPosition(int position) {
-    if (head == NULL) {
+void deleteElementAtPosition(int position)
+{
+    if (head == NULL)
+    {
         printf("List is empty. Deletion not possible.\n");
         return;
     }
 
-    Node* temp = head;
+    Node *temp = head;
 
-    if (position == 1) {
+    if (position == 1)
+    {
         head = temp->next;
         free(temp);
-    } else {
-        for (int i = 1; i < position - 1 && temp != NULL; ++i) {
+    }
+    else
+    {
+        for (int i = 1; i < position - 1 && temp != NULL; ++i)
+        {
             temp = temp->next;
         }
 
-        if (temp != NULL && temp->next != NULL) {
-            Node* toDelete = temp->next;
+        if (temp != NULL && temp->next != NULL)
+        {
+            Node *toDelete = temp->next;
             temp->next = toDelete->next;
             free(toDelete);
-        } else {
+        }
+        else
+        {
             printf("Invalid position for deletion.\n");
         }
     }
 }
 
 // Function to perform bubble sort on the list
-void bubbleSort() {
+void bubbleSort()
+{
     int swapped;
-    Node* ptr1;
-    Node* lptr = NULL;
+    Node *ptr1;
+    Node *lptr = NULL;
 
     if (head == NULL)
         return;
 
-    do {
+    do
+    {
         swapped = 0;
         ptr1 = head;
 
-        while (ptr1->next != lptr) {
-            if (ptr1->data > ptr1->next->data) {
+        while (ptr1->next != lptr)
+        {
+            if (ptr1->data > ptr1->next->data)
+            {
                 int temp = ptr1->data;
                 ptr1->data = ptr1->next->data;
                 ptr1->next->data = temp;
@@ -63,8 +137,9 @@ void bubbleSort() {
     } while (swapped);
 }
 
-int main() {
-     const int screenWidth = 800;
+int main()
+{
+    const int screenWidth = 800;
     const int screenHeight = 600;
 
     InitWindow(screenWidth, screenHeight, "Raylib LinkedList Visualization");
@@ -75,8 +150,8 @@ int main() {
 
     char addBuffer[10] = "\0";    // Buffer for add input, allowing up to 10 digits
     char deleteBuffer[10] = "\0"; // Buffer for delete input, allowing up to 10 digits
-    
-    int action = 0;                 // 0: No action, 1: Add Element, 2: Delete Element, 3: Start Sorting
+
+    int action = 0; // 0: No action, 1: Add Element, 2: Delete Element, 3: Start Sorting
 
     int addActive = 0;
     int deleteActive = 0;
@@ -168,23 +243,24 @@ int main() {
         default:
             if (addActive == 1)
             {
-                // Process numerical input
-                if ((key >= KEY_ZERO) && (key <= KEY_NINE))
+                if (((key >= KEY_ZERO) && (key <= KEY_NINE)) || ((key >= KEY_KP_0) && (key <= KEY_KP_9)))
                 {
                     if (strlen(addBuffer) < 10)
                     {
-                        addBuffer[strlen(addBuffer)] = (char)(key);
+                        char digit = (key >= KEY_KP_0 && key <= KEY_KP_9) ? (char)(key - KEY_KP_0 + '0') : (char)(key);
+                        addBuffer[strlen(addBuffer)] = digit;
                     }
                 }
             }
+
             if (deleteActive == 1)
             {
-                // Process numerical input
-                if ((key >= KEY_ZERO) && (key <= KEY_NINE))
+                if (((key >= KEY_ZERO) && (key <= KEY_NINE)) || ((key >= KEY_KP_0) && (key <= KEY_KP_9)))
                 {
                     if (strlen(deleteBuffer) < 10)
                     {
-                        deleteBuffer[strlen(deleteBuffer)] = (char)(key);
+                        char digit = (key >= KEY_KP_0 && key <= KEY_KP_9) ? (char)(key - KEY_KP_0 + '0') : (char)(key);
+                        deleteBuffer[strlen(deleteBuffer)] = digit;
                     }
                 }
             }
@@ -200,7 +276,8 @@ int main() {
                 insertAtEnd(data);
 
                 highlightedNode = 0;
-                for(int i = 0; i < 10; i++) {
+                for (int i = 0; i < 10; i++)
+                {
                     addBuffer[i] = '\0';
                 }
             }
@@ -211,7 +288,8 @@ int main() {
                 int position = atoi(deleteBuffer);
                 deleteElementAtPosition(position);
 
-                for(int i = 0; i < 10; i++) {
+                for (int i = 0; i < 10; i++)
+                {
                     deleteBuffer[i] = '\0';
                 }
             }
@@ -234,5 +312,3 @@ int main() {
 
     return 0;
 }
-
-
